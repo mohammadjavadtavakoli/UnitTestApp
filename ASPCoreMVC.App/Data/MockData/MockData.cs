@@ -18,17 +18,16 @@ namespace ASPCoreMVC.App.Data.MockData
         //        Author = "Peter Drucker",
         //    };
         //}
-
-        //private static Book GetTestBookById()
-        //{
-        //    return new Book()
-        //    {
-        //        Id = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200"),
-        //        Title = "Managing Oneself",
-        //        Description = "We live in an age of unprecedented opportunity: with ambition, drive, and talent, you can rise to the top of your chosen profession, regardless of where you started out...",
-        //        Author = "Peter Drucker",
-        //    };
-        //}
+        public static Book GetTestBookById()
+        {
+            return new Book()
+            {
+                Id = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200"),
+                Title = "Managing Oneself",
+                Description = "We live in an age of unprecedented opportunity: with ambition, drive, and talent, you can rise to the top of your chosen profession, regardless of where you started out...",
+                Author = "Peter Drucker",
+            };
+        }
 
 
         public static IEnumerable<Book> GetTestBookItems()

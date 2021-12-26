@@ -34,5 +34,32 @@ namespace WebApi.Test
             Assert.Equal(5, viewResultBooks.Count);
 
         }
+        [Theory]
+        [InlineData("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200", "117366b8-3541-4ac5-8732-860d698e1111")]
+        public void DetailsUnitTest(string validguid, string invalidguid)
+        {
+            //arrange 
+            var mockRepo = new Mock<IBookService>();
+            var validItemguid = new Guid(validguid);
+            mockRepo.Setup(g => g.GetByID(validItemguid)).Returns(MockData.GetTestBookById());
+            var controller = new HomeController(mockRepo.Object);
+
+            //act 
+            var result = controller.Details(validItemguid);
+            //assert
+
+            var viewresult = Assert.IsType<ViewResult>(result);
+            var viewresultValue = Assert.IsAssignableFrom<Book>(viewresult.ViewData.Model);
+            Assert.Equal("Managing Oneself", viewresultValue.Title);
+            Assert.Equal("Peter Drucker", viewresultValue.Author);
+            Assert.Equal(validItemguid, viewresultValue.Id);
+            //arrange 
+            var invalidItemguid = new Guid(invalidguid);
+            //mockRepo.Setup(n=>n.GetByID(invalidItemguid))
+
+            //act 
+
+            //assert
+        }
     }
 }
