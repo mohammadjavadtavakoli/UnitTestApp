@@ -1,137 +1,37 @@
+﻿using ASPCoreMVC.App.Controllers;
+using ASPCoreMVC.App.Data.MockData;
+using ASPCoreMVC.App.Data.Models;
+using ASPCoreMVC.App.Data.Services;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using WebAPI.Controllers;
-using WebAPI.Data.Models;
-using WebAPI.Data.Services;
+using System.Text;
 using Xunit;
 
 namespace WebApi.Test
 {
     public class BooksControllerTest
     {
-        BooksController _controller;
-        IBookService _Service;
-
-        public BooksControllerTest()
-        {
-            _Service = new BookService();
-            _controller = new BooksController(_Service);
-        }
-
         [Fact]
-        public void GetAllTest()
+        public void IndexUnitTest()
         {
-            //Arrange
-
-            //Act
-            var result = _controller.Get();
-
-
+            //arrange 
+            var mockRepo = new Mock<IBookService>();
+            mockRepo.Setup(n => n.GetAll()).Returns(MockData.GetTestBookItems());
+            var controller = new HomeController(mockRepo.Object);
+            // act
+            var result = controller.Index();
             //assert
-            Assert.IsType<OkObjectResult>(result.Result);
+            var viewResult = Assert.IsType<ViewResult>(result);
 
-            var list = result.Result as OkObjectResult;
+            //var viewResult = result as ViewResult;
 
-            Assert.IsType<List<Book>>(list.Value);
+            var viewResultBooks = Assert.IsAssignableFrom<List<Book>>(viewResult.ViewData.Model);
 
-            var ListBooks = list.Value as List<Book>;
+            //var viewResultBooks = viewResult.ViewData.Model as List<Book>;
 
-            Assert.Equal(5, ListBooks.Count);
-        }
-        [Theory]
-        [InlineData("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200", "ab2bd817-98cd-4cf3-a80a-53ea0cd9c111")]
-        public void GetByIdTest(string guid1, string guid2)
-        {
-            //arrange
-            var validGuid = new Guid(guid1);
-            var invalidGuid = new Guid(guid2);
-
-            //act
-            var notFoundResult = _controller.Get(invalidGuid);
-            var okResult = _controller.Get(validGuid);
-
-            //assert
-
-            Assert.IsType<NotFoundResult>(notFoundResult.Result);
-            Assert.IsType<OkObjectResult>(okResult.Result);
-
-            var item = okResult.Result as OkObjectResult;
-            Assert.IsType<Book>(item.Value);
-
-            var bookItem = item.Value as Book;
-
-            Assert.Equal(validGuid, bookItem.Id);
-
-            Assert.Equal("Managing Oneself", bookItem.Title);
-
-        }
-        [Fact]
-        public void AddBookTest()
-        {
-            //arrange
-            var completeBook = new Book()
-            {
-                Author = "Author",
-                Title = "Title",
-                Description = "Description"
-            };
-
-            //act
-
-            var createdResponse = _controller.Post(completeBook);
-
-            //assert
-            Assert.IsType<CreatedAtActionResult>(createdResponse);
-            var item = createdResponse as CreatedAtActionResult;
-            Assert.IsType<Book>(item.Value);
-
-            var bookItem = item.Value as Book;
-            Assert.Equal(completeBook.Author, bookItem.Author);
-            Assert.Equal(completeBook.Title, bookItem.Title);
-            Assert.Equal(completeBook.Description, bookItem.Description);
-
-            //arrange
-            var incompleteBook = new Book()
-            {
-                Author = "Author",
-                Description = "Description"
-            };
-
-            // act 
-
-            _controller.ModelState.AddModelError("Title", "Title is a required field");
-
-            var badResponse = _controller.Post(incompleteBook);
-
-            Assert.IsType<BadRequestObjectResult>(badResponse);
-
-        }
-
-        [Theory]
-        [InlineData("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200", "ab2bd817-98cd-4cf3-a80a-53ea0cd9c111")]
-        public void RemoveBookIdTest(string guid1, string guid2)
-        {
-            //arrange
-            var validGuid = new Guid(guid1);
-            var invalidGuid = new Guid(guid2);
-
-            //act
-            var notFoundResult = _controller.Remove(invalidGuid);
-
-            //assert
-            Assert.IsType<NotFoundResult>(notFoundResult);
-            Assert.Equal(5, _Service.GetAll().Count());
-
-            //act
-
-            var okResult = _controller.Remove(validGuid);
-
-            //assert
-
-            Assert.IsType<OkResult>(okResult);
-            Assert.Equal(4, _Service.GetAll().Count()-1);
+            Assert.Equal(5, viewResultBooks.Count);
 
         }
     }
