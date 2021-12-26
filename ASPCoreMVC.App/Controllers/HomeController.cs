@@ -14,7 +14,7 @@ namespace ASPCoreMVC.App.Controllers
         private readonly IBookService _service;
         public HomeController(IBookService service)
         {
-            this._service = service;
+           _service = service;
         }
         // GET: HomeController
         public ActionResult Index()
