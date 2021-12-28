@@ -53,13 +53,66 @@ namespace WebApi.Test
             Assert.Equal("Managing Oneself", viewresultValue.Title);
             Assert.Equal("Peter Drucker", viewresultValue.Author);
             Assert.Equal(validItemguid, viewresultValue.Id);
+
             //arrange 
             var invalidItemguid = new Guid(invalidguid);
-            //mockRepo.Setup(n=>n.GetByID(invalidItemguid))
+            mockRepo.Setup(n => n.GetByID(invalidItemguid)).Returns(MockData.InvalidGetTestBookById());
 
             //act 
 
+            var notFound = controller.Details(invalidItemguid);
             //assert
+
+            var notFoundresult = Assert.IsType<NotFoundResult>(notFound);
+        }
+
+
+        [Fact]
+        public void CreateTest()
+        {
+            //arrange
+            var mockRepo = new Mock<IBookService>();
+            var controller = new HomeController(mockRepo.Object);
+            var newValidItem = new Book()
+            {
+                Author = "Author",
+                Title = "Title",
+                Description = "Description"
+
+            };
+            //act 
+
+            var result = controller.Create(newValidItem);
+
+
+            //assert
+
+            var RedirectToActionResultView = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", RedirectToActionResultView.ActionName);
+            Assert.Null(RedirectToActionResultView.ControllerName);
+
+            //arrange
+            var newInValidItem = new Book()
+            {
+                Title = "Title",
+                Description = "Description"
+
+            };
+            controller.ModelState.AddModelError("Author", "The Author Value is Required");
+
+            //act 
+
+            var Invalidresult = controller.Create(newInValidItem);
+
+
+            //assert
+
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(Invalidresult);
+            Assert.IsType<SerializableError>(badRequestResult.Value);
+
+          
+
+
         }
     }
 }

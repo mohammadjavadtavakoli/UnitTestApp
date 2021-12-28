@@ -29,6 +29,11 @@ namespace ASPCoreMVC.App.Data.MockData
             };
         }
 
+        public static Book InvalidGetTestBookById()
+        {
+            return null;
+        }
+
 
         public static IEnumerable<Book> GetTestBookItems()
         {
