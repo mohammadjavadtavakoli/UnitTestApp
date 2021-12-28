@@ -110,9 +110,23 @@ namespace WebApi.Test
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(Invalidresult);
             Assert.IsType<SerializableError>(badRequestResult.Value);
 
-          
+        }
 
+        [Theory]
+        [InlineData("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200")]
+        public void DeleteTest(string ValidGuid)
+        {
+            var mockRepo = new Mock<IBookService>();
+            var GUID = new Guid(ValidGuid);
+            mockRepo.Setup(c => c.GetByID(GUID)).Returns(MockData.GetTestBookById);
+            var controller = new HomeController(mockRepo.Object);
+            var result = controller.Delete(GUID, null);
+
+          var RedirectToActionResultView=  Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", RedirectToActionResultView.ActionName);
+            Assert.Null(RedirectToActionResultView.ControllerName);
 
         }
+
     }
 }
